@@ -1,0 +1,22 @@
+{
+  "extends": ["react-app", "prettier, unused-imports"],
+  // "plugins": ["prettier"],
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"],
+    "space-before-function-paren": "error",
+    "space-before-blocks": "error",
+    "space-in-parens": "error",
+    "space-infix-ops": "error",
+    "space-unary-ops": "error",
+    "no-mixed-spaces-and-tabs": "error",
+    "no-spaced-func": "error",
+    "no-multi-spaces": "error",
+    "spaced-comment": "error",
+    "key-spacing": "error",
+    "arrow-spacing": "error",
+    "keyword-spacing": "error",
+    "func-call-spacing": "error",
+    // "prettier/prettier": ["error"]
+  }
+}
