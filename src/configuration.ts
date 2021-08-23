@@ -1,4 +1,4 @@
-const baseUrl = "/api/v1";
+const baseUrl = "/api";
 const signIn = baseUrl + "/account/signin";
 const signUp = baseUrl + "/account/signup";
 const logoutUrl = baseUrl + "/account/signout";

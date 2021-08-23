@@ -6,7 +6,7 @@ export default class AccountService {
     makeAutoObservable(this);
   }
 
-  tokenName = "dqe-token";
+  tokenName = "cqf-token";
 
   getToken = () => localStorage.getItem(this.tokenName);
   setToken = (value: string) => localStorage.setItem(this.tokenName, value);
@@ -33,6 +33,10 @@ export default class AccountService {
     }
 
     const token = (data as Sign).token;
+
+    if (token === undefined)
+      return "Error";
+    
     this.setToken(token);
     this.setCurrentToken(token);
 
