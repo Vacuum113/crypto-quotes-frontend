@@ -1,6 +1,7 @@
 import React, { useContext, useState, FC } from "react";
 import { Box, makeStyles, Tab, Tabs, Typography } from "@material-ui/core";
 import ServicesContext, { Context } from "../services/ServicesContext";
+import ResultGrid from "./grid/ResultGrid";
 
 const useStyles = makeStyles((theme) => ({
   tabPanel: {
@@ -26,7 +27,7 @@ const MainWindow: FC<React.HTMLAttributes<HTMLDivElement>> =
 
     return (
       <div className={classes.root}>
-
+        <ResultGrid />
       </div>
     );
   };

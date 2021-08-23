@@ -38,7 +38,7 @@ const fetchPut = async (relativeUrl: string, body: object) => await customFetch(
 
 const fetchGet = async (relativeUrl: string) => await customFetch(relativeUrl, null, "GET");
 
-const sendGetRequest = async (path: string) => {
+const sendGetRequest = async <T extends Data>(path: string): Promise<T | FailureData> => {
   return executeRequest(async () => await fetchGet(path));
 };
 
@@ -67,9 +67,14 @@ const signup = async (login: string, password: string) => {
   return await sendPostRequest<Sign>("/account/signup", { login, password });
 };
 
+const loadQuotes = async (start: number, end: number, order: string) => {
+  return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}&order=${order}`,);
+};
+
 export default {
   signin,
   signup,
+  loadQuotes
 };
 
 interface Headers {
@@ -86,4 +91,9 @@ export type FailureData = Data & {
 
 export type Sign = Data & {
   token: string;
+};
+
+export type GridResult = Data & {
+  count: number,
+  entities: Array<any>
 };
