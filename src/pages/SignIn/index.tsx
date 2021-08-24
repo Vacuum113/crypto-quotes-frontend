@@ -9,7 +9,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Redirect } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 import { Routes } from "../../configuration";
 import ServicesContext, { Context } from "../../services/ServicesContext";
 
@@ -25,19 +25,23 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
+  link: {
+    cursor: "pointer"
+  }
 }));
 
 export default () => {
   const classes = useStyles();
+  const history = useHistory();
+
   const [email, setEmail] = useState<string | undefined>();
   const [password, setPassword] = useState<string | undefined>();
-  // const [ aggredWithRules, setAggredWithRules ] = useState<boolean | undefined>();
   const [error, setError] = useState<string>();
   const accountService = useContext<Context>(ServicesContext).accountService;
 
@@ -56,8 +60,12 @@ export default () => {
       return;
     }
 
-    return <Redirect to={Routes.home} />;
+    history.push(Routes.home);
   };
+
+  const redirectToSignUp = () => {
+    history.push(Routes.signUp);
+  }
 
   return (
     <Container component="main" maxWidth="xs">
@@ -96,12 +104,6 @@ export default () => {
                 autoComplete="current-password"
               />
             </Grid>
-            {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox  value="allowExtraEmails" color="primary"  onChange={e => setAggredWithRules(e.target.checked)} />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
           </Grid>
           <Button
             type="submit"
@@ -115,14 +117,14 @@ export default () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Typography variant="caption" display="block" gutterBottom>
+              <Typography variant="caption" display="block" gutterBottom color="error">
                 {error}
               </Typography>
             </Grid>
           </Grid>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Link href="/signup" variant="body2">
+              <Link variant="body2" onClick={redirectToSignUp} className={classes.link}>
                 Don't have an account? Sign Up
               </Link>
             </Grid>

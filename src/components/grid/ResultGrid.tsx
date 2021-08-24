@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { DataGrid, GridColDef, GridRowData } from "@material-ui/data-grid";
+import { DataGrid, GridColDef, GridRowData, GridSortModel } from "@material-ui/data-grid";
 import api, { GridResult } from "../../dataProvider/api";
 
 const ResultGrid = () => {
   const [rows, setRows] = useState<GridRowData[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [loading, setLoading] = React.useState(false);
-  const [rowCount, setRowCount] = React.useState(0);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [rowCount, setRowCount] = useState(0);
+  const [sortModel, setSortModel] = useState<GridSortModel>([{field: "marketCap", sort: "asc"}]);
 
   const handlePageChange = (page: number) => {
     setPage(page);
@@ -15,15 +16,17 @@ const ResultGrid = () => {
   useEffect(() => {
     (async () => {
         setLoading(true);
-
-        const resultData = await api.loadQuotes((page * 10), (page * 10 + 10), "Id") as GridResult;
+        console.log(sortModel);
+        const fieldName = sortModel[0] ? sortModel[0].field.charAt(0).toUpperCase() + sortModel[0].field.slice(1) : undefined;
+        const sort =  sortModel[0] ? sortModel[0].sort === "asc" ? 0 : 1 : undefined;
+        const resultData = await api.loadQuotes((page * 10), (page * 10 + 10), fieldName, sort) as GridResult;
         if (resultData) {
           setRows(resultData.entities.map(e => ({logo: `https://s2.coinmarketcap.com/static/img/coins/32x32/${e.coinMarketCapId}.png`, ...e})));
           setRowCount(resultData.count);
         }
         setLoading(false);
     })();
-  }, [page]);
+  }, [page, sortModel]);
   
   return (
     <div style={{ height: "647px", width: "100%" }}>
@@ -31,20 +34,21 @@ const ResultGrid = () => {
         rows={rows}
         columns={columns}
         pageSize={10}
-        checkboxSelection
         rowCount={rowCount}
         pagination
         disableSelectionOnClick
         paginationMode="server"
         onPageChange={handlePageChange}
         loading={loading}
+        onSortModelChange={e => {console.log(e); setSortModel(e);}}
+        sortModel={sortModel}
       />
     </div>
   );
 };
 
 const columns: GridColDef[] = [ 
-  { field: "name", width: 140, headerName: "Название" }, 
+  { field: "name", width: 250, headerName: "Название" }, 
   { field: "symbol", width: 130, headerName: "Символ" },
   { field: "price", width: 220, headerName: "Текущая цена в USD" },
   { 
@@ -55,7 +59,8 @@ const columns: GridColDef[] = [
       return (
         <img src={params.value as string}></img >
       );
-    }
+    },
+    sortable: false
   },
   { field: "percentChangeOneHour", width: 200, headerName: "Изменение за час" }, 
   { field: "percentChangeTwentyFourHours", width: 230, headerName: "Изменение за 24 часа" }, 

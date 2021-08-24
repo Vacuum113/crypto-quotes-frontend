@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -35,17 +35,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const emailValidationString =
+  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
 export default () => {
   const classes = useStyles();
-  const [email, setEmail] = useState<string | undefined>();
-  const [password, setPassword] = useState<string | undefined>();
-  const [aggredWithRules, setAggredWithRules] = useState<boolean | undefined>();
-  const [error, setError] = useState<string>();
+  const [email, setEmail] = useState<string | undefined>("");
+  const [password, setPassword] = useState<string | undefined>("");
+  const [repeatedPassword, setRepeatedPassword] = useState<string | undefined>("");
+  const [error, setError] = useState<string | undefined>();
   const history = useHistory();
   const accountService = useContext<Context>(ServicesContext).accountService;
 
   const isDisabled = (): boolean => {
-    if (email && password && aggredWithRules) {
+    const canSubmit =
+      email && password && password === repeatedPassword && error === undefined;
+    if (canSubmit) {
       return false;
     }
     return true;
@@ -60,6 +65,44 @@ export default () => {
     }
 
     history.push(Routes.home);
+  };
+
+  useEffect(() => {
+    validateEmail(email);
+  }, [email]);
+
+  useEffect(() => {
+    validatePassword(password, repeatedPassword);
+  }, [password, repeatedPassword]);
+
+  const handleInputEmail = (inputEmail: string) => {
+    setEmail(inputEmail);
+    setError(undefined);
+  };
+
+  function validateEmail(inputEmail: string | undefined) {
+    if (inputEmail === "")
+      return;
+
+    if (inputEmail === undefined) {
+      setError(emailError);
+      return;
+    }
+
+    const validationResult = emailValidationString.test(String(inputEmail).toLowerCase());
+    
+    if (!validationResult) {
+      setError(emailError);
+      return;
+    }
+  }
+
+  const validatePassword = (password: string | undefined, repeatedPassword: string | undefined) => {
+    if (password === undefined || repeatedPassword === undefined || password !== repeatedPassword) {
+      setError(passwordError);
+    } else {
+      setError(undefined);
+    }
   };
 
   return (
@@ -79,9 +122,9 @@ export default () => {
                 variant="outlined"
                 required
                 fullWidth
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleInputEmail(e.target.value)}
                 id="email"
-                label="Email Address"
+                label="Email"
                 name="email"
                 autoComplete="email"
               />
@@ -100,15 +143,16 @@ export default () => {
               />
             </Grid>
             <Grid item xs={12}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    value="allowExtraEmails"
-                    color="primary"
-                    onChange={(e) => setAggredWithRules(e.target.checked)}
-                  />
-                }
-                label="I want to receive inspiration, marketing promotions and updates via email."
+              <TextField
+                variant="outlined"
+                required
+                fullWidth
+                onChange={(e) => setRepeatedPassword(e.target.value)}
+                name="repeatpassword"
+                label="Repeat Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
               />
             </Grid>
           </Grid>
@@ -124,9 +168,16 @@ export default () => {
           </Button>
           <Grid container justifyContent="flex-end">
             <Grid item>
-              <Typography variant="caption" display="block" gutterBottom>
-                {error}
-              </Typography>
+              {error && (
+                <Typography
+                  variant="caption"
+                  display="block"
+                  gutterBottom
+                  color="error"
+                >
+                  {error}
+                </Typography>
+              )}
             </Grid>
           </Grid>
           <Grid container justifyContent="flex-end">
@@ -141,3 +192,6 @@ export default () => {
     </Container>
   );
 };
+
+const emailError = "Email is invalid.";
+const passwordError = "Passwords are different";

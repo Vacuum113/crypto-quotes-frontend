@@ -28,8 +28,8 @@ export default class AccountService {
     request: (email: string, password: string) => Promise<FailureData | Sign>
   ) => {
     const data = await request(email!, password!);
-    if ((data as FailureData).message !== undefined) {
-      return (data as FailureData).message;
+    if ((data as FailureData).error !== undefined) {
+      return (data as FailureData).error;
     }
 
     const token = (data as Sign).token;

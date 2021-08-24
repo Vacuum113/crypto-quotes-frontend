@@ -11,8 +11,9 @@ const customFetch = async (
     headers: getHeaders(isFile),
     body: body == null ? null : isFile ? body : JSON.stringify(body),
   });
-  
-  if (response.status === 401) {
+
+  // @ts-ignore
+  if (response.status === 401 && window.accountService.currentToken) {
     // @ts-ignore
     window.accountService.logout();
     document.location.reload();
@@ -67,8 +68,12 @@ const signup = async (login: string, password: string) => {
   return await sendPostRequest<Sign>("/account/signup", { login, password });
 };
 
-const loadQuotes = async (start: number, end: number, order: string) => {
-  return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}&order=${order}`,);
+const loadQuotes = async (start: number, end: number, order: string | undefined, orderBy: number | undefined) => {
+  if (!order)
+    return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}"`,);
+
+  
+  return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}&order=${order}&orderBy=${orderBy}`,);
 };
 
 export default {
@@ -86,7 +91,7 @@ type Data = {
 };
 
 export type FailureData = Data & {
-  message: string;
+  error: string;
 };
 
 export type Sign = Data & {
