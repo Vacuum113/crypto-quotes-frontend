@@ -35,26 +35,20 @@ const getHeaders = (isFile: boolean) => {
 
 const fetchPost = async (relativeUrl: string, body?: object, isFile: boolean = false) => await customFetch(relativeUrl, body, "POST", isFile);
 
-const fetchPut = async (relativeUrl: string, body: object) => await customFetch(relativeUrl, body, "PUT");
-
 const fetchGet = async (relativeUrl: string) => await customFetch(relativeUrl, null, "GET");
 
-const sendGetRequest = async <T extends Data>(path: string): Promise<T | FailureData> => {
-  return executeRequest(async () => await fetchGet(path));
+const sendGetRequest = async <T>(path: string): Promise<T | null> => {
+  return await executeRequest(async () => await fetchGet(path)) as T;
 };
 
-const sendPutRequest = async (path: string, payload?: any) => {
-  return executeRequest(async () => await fetchPut(path, payload));
+const sendPostRequest = async <T>(path: string, payload?: any): Promise<Response<T> | null> => {
+  return await executeRequest(async () => await fetchPost(path, payload));
 };
 
-const sendPostRequest = async <T extends Data>(path: string, payload?: any): Promise<T | FailureData> => {
-  return executeRequest(async () => await fetchPost(path, payload));
-};
-
-const executeRequest = async (request: () => Promise<Response>) => {
+const executeRequest = async (request: () => Promise<globalThis.Response>) => {
   try {
     const response = await request();
-    return response.json();
+    return (await response.json());
   } catch {
     return null;
   }
@@ -72,7 +66,6 @@ const loadQuotes = async (start: number, end: number, order: string | undefined,
   if (!order)
     return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}"`,);
 
-  
   return await sendGetRequest<GridResult>(`/cryptocurrency?start=${start}&end=${end}&order=${order}&orderBy=${orderBy}`,);
 };
 
@@ -86,19 +79,25 @@ interface Headers {
   [key: string]: string;
 }
 
-type Data = {
-  status: number;
+export type Response<TInternalData> = {
+  succeeded: boolean;
+  errorMessage?: string;
+  errorCode?: ErrorCode;
+  data?: TInternalData;
 };
 
-export type FailureData = Data & {
-  error: string;
-};
 
-export type Sign = Data & {
+export type Sign = {
   token: string;
 };
 
-export type GridResult = Data & {
+export type GridResult = {
   count: number,
   entities: Array<any>
 };
+
+enum ErrorCode {
+  GenericError,
+  Unauthorized,
+  Forbidden,
+}

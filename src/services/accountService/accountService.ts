@@ -1,4 +1,4 @@
-import api, { FailureData, Sign } from "../../dataProvider/api";
+import api, { Response, Sign } from "../../dataProvider/api";
 import { makeAutoObservable } from "mobx";
 
 export default class AccountService {
@@ -25,14 +25,14 @@ export default class AccountService {
   sendUserCredits = async (
     email: string,
     password: string,
-    request: (email: string, password: string) => Promise<FailureData | Sign>
+    request: (email: string, password: string) => Promise<Response<Sign> | null>
   ) => {
-    const data = await request(email!, password!);
-    if ((data as FailureData).error !== undefined) {
-      return (data as FailureData).error;
+    const response = await request(email!, password!);
+    if (!response?.succeeded) {
+      return response?.errorMessage ?? null;
     }
 
-    const token = (data as Sign).token;
+    const token = response.data?.token;
 
     if (token === undefined)
       return "Error";

@@ -19,7 +19,9 @@ const ResultGrid = () => {
         console.log(sortModel);
         const fieldName = sortModel[0] ? sortModel[0].field.charAt(0).toUpperCase() + sortModel[0].field.slice(1) : undefined;
         const sort =  sortModel[0] ? sortModel[0].sort === "asc" ? 0 : 1 : undefined;
-        const resultData = await api.loadQuotes((page * 10), (page * 10 + 10), fieldName, sort) as GridResult;
+        
+        const resultData = await api.loadQuotes((page * 10), (page * 10 + 10), fieldName, sort);
+
         if (resultData) {
           setRows(resultData.entities.map(e => ({logo: `https://s2.coinmarketcap.com/static/img/coins/32x32/${e.coinMarketCapId}.png`, ...e})));
           setRowCount(resultData.count);
