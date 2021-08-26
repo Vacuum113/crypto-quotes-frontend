@@ -15,24 +15,22 @@ export default class AccountService {
   currentToken: string | null = this.getToken();
 
   signIn = async (email: string, password: string): Promise<string | null> => {
-    return this.sendUserCredits(email, password, api.signin);
+    const result = await api.signin(email, password);
+    return this.handleResult(result);
   };
 
-  signUp = async (email: string, password: string): Promise<string | null> => {
-    return this.sendUserCredits(email, password, api.signup);
+  signUp = async (email: string, password: string, repeatedPassword: string): Promise<string | null> => {
+    const result = await api.signup(email, password, repeatedPassword);
+    return await this.handleResult(result);
   };
 
-  sendUserCredits = async (
-    email: string,
-    password: string,
-    request: (email: string, password: string) => Promise<Response<Sign> | null>
-  ) => {
-    const response = await request(email!, password!);
-    if (!response?.succeeded) {
-      return response?.errorMessage ?? null;
+  handleResult = async (result: Response<Sign> | null
+    )=> {
+    if (!result?.succeeded) {
+      return result?.errorMessage ?? null;
     }
 
-    const token = response.data?.token;
+    const token = result.data?.token;
 
     if (token === undefined)
       return "Error";

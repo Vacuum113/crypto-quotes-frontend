@@ -58,8 +58,8 @@ const signin = async (login: string, password: string) => {
   return await sendPostRequest<Sign>("/account/signin", { login, password });
 };
 
-const signup = async (login: string, password: string) => {
-  return await sendPostRequest<Sign>("/account/signup", { login, password });
+const signup = async (login: string, password: string, repeatedPassword: string) => {
+  return await sendPostRequest<Sign>("/account/signup", { login, password, repeatedPassword });
 };
 
 const loadQuotes = async (start: number, end: number, order: string | undefined, orderBy: number | undefined) => {

@@ -16,7 +16,6 @@ const ResultGrid = () => {
   useEffect(() => {
     (async () => {
         setLoading(true);
-        console.log(sortModel);
         const fieldName = sortModel[0] ? sortModel[0].field.charAt(0).toUpperCase() + sortModel[0].field.slice(1) : undefined;
         const sort =  sortModel[0] ? sortModel[0].sort === "asc" ? 0 : 1 : undefined;
         
@@ -42,7 +41,7 @@ const ResultGrid = () => {
         paginationMode="server"
         onPageChange={handlePageChange}
         loading={loading}
-        onSortModelChange={e => {console.log(e); setSortModel(e);}}
+        onSortModelChange={e => setSortModel(e)}
         sortModel={sortModel}
       />
     </div>

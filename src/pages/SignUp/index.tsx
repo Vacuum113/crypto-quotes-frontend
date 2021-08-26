@@ -58,7 +58,7 @@ export default () => {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    const result = await accountService.signUp(email!, password!);
+    const result = await accountService.signUp(email!, password!, repeatedPassword!);
     if (result !== null) {
       setError(result);
       return;
